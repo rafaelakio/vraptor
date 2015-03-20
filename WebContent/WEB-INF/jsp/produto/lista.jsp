@@ -8,6 +8,7 @@
 <title>Lista de Produtos</title>
 </head>
 <body>
+<h1>${mensagem }</h1>
 <table>
 	<thead>
 		<tr>

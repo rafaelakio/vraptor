@@ -7,7 +7,13 @@ import java.util.List;
 
 import br.com.caelum.online.loja.dominio.Produto;
 import br.com.caelum.online.loja.repositorio.RepositorioDeProdutos;
+import br.com.caelum.vraptor.ioc.Component;
+import br.com.caelum.vraptor.ioc.RequestScoped;
 
+//Com essa annotation dizemos que o vraptor podera instanciar esse componente
+// dizemos assim que o ProdutoDao sera gerenciado pelo vraptor
+@Component
+@RequestScoped //nao eh necessario pois eh o default
 public class ProdutoDao implements RepositorioDeProdutos {
 
 	private final static List<Produto> PRODUTOS = new ArrayList<Produto>();
