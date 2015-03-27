@@ -8,16 +8,20 @@
 <title>Novo Produto</title>
 </head>
 <body>
+<!--  recuperando os dados do validator presente na controller -->
+<c:forEach items="${errors }" var="erro">
+	${error.category } - ${error.message }
+</c:forEach>
 <form action="<c:url value="/produto/adiciona"/>" method="post" >
 <table>
 	<tr>
-		<td>Nome</td><td><input name="produto.nome"/></td>
+		<td>Nome</td><td><input name="produto.nome" value="${produto.nome}"/></td>
 	</tr>
 	<tr>
-		<td>Descrição</td><td><input name="produto.descricao"/></td>
+		<td>Descrição</td><td><input name="produto.descricao" value="${produto.descricao}"/></td>
 	</tr>
 	<tr>
-		<td>Preço</td><td><input name="produto.preco"/></td>
+		<td>Preço</td><td><input name="produto.preco" value="${produto.preco}"/></td>
 	</tr>
 	<tr>
 		<td><input type="submit" value="Adicionar"/></td>

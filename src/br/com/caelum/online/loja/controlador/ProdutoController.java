@@ -10,6 +10,10 @@ import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.Validator;
+import br.com.caelum.vraptor.validator.I18nMessage;
+import br.com.caelum.vraptor.validator.ValidationMessage;
+import br.com.caelum.vraptor.validator.Validations;
 import br.com.caelum.vraptor.view.Results;
 
 @Resource
@@ -18,11 +22,13 @@ public class ProdutoController {
 	private final RepositorioDeProdutos produtos;
 	//private final ProdutoDao produtos;
 	private final Result result;
+	private Validator validator;
 	
 	// injetando dependencia do componente gerenciado pelo vRaptor - ProdutoDao
-	public ProdutoController(Result result, RepositorioDeProdutos produto) {
+	public ProdutoController(Result result, RepositorioDeProdutos produto, Validator validator) {
 		this.result = result;
 		this.produtos = produto;
+		this.validator = validator;
 	}
 	
 	public void formulario(){
@@ -69,7 +75,28 @@ public class ProdutoController {
 	}
 	
 	@Post
-	public void adiciona(Produto produto){
+	public void adiciona(final Produto produto){
+		
+		// se quiser fazer a validacao por javabean, podemos utilizar o checking
+		// as mensagens nesse caso, sao configuradas no arquivo messages.properties
+		validator.checking(new Validations() {
+			{
+				that(produto.getNome().trim().equals(""), "erro", "produto.nome.invalido");
+			}
+		});
+		
+		// realizando validacoes com internacionalizacao
+		if (produto.getDescricao().trim().equals("")) {
+			validator.add(new I18nMessage("descricao", "produto.descricao.invalido"));
+		}
+		
+		// validação de dados da tela;
+		if (produto.getPreco() < 0.1) {
+			validator.add(new ValidationMessage("O preço deve ser maior do que R$ 0,10", "preco"));
+		}
+		// se algum erro ocorrer, o validator pode redicionar o fluxo para outra request
+		validator.onErrorUsePageOf(ProdutoController.class).formulario();
+		
 		produtos.salva(produto);
 		// incluindo viewmodels para a jsp
 		this.result.include("mensagem", "Novo produto adicionado com sucesso!!");
@@ -82,5 +109,11 @@ public class ProdutoController {
 		// para realizar o redirect como uma nova requisicao, alterando assim a url
 		// como se fizessemos duas requisicoes diferentes
 		this.result.redirectTo(ProdutoController.class).lista();
+	}
+	
+	public void remove(Produto produto) {
+		produtos.remove(produto);
+		// informa que não quero renderizar nada como resposta desse metodo
+		result.nothing();
 	}
 }
